@@ -12,8 +12,7 @@ require "bundler/setup"
 
 require "newrelic_plugin"
 
-require File.join(File.dirname(__FILE__), 'lib/passenger_memory_stats_parser')
-require File.join(File.dirname(__FILE__), 'lib/passenger_status_parser')
+require File.join(File.dirname(__FILE__), 'lib/passenger_parser')
 
 module PassengerAgent
 
@@ -36,13 +35,13 @@ module PassengerAgent
       raise ConfigurationError, "passenger_version config variable must be set" unless defined?(passenger_version)
       raise ConfigurationError, "Passenger version must be one of #{valid_passenger_versions}" unless valid_passenger_versions.include?(passenger_version)
 
-      @memory_stats_parser = PassengerMemoryStatsParser.new
-      @status_parser = PassengerStatusParser.new(passenger_version)
+      @memory_stats_parser = PassengerMemoryStatsParser.new(passenger_memory_stats,passenger_version)
+      @status_parser = PassengerStatusParser.new(passenger_status,passenger_version)
     end
 
 
     def report_passenger_status
-      @status_parser.output_to_parse = run_command(passenger_status)
+      return unless @status_parser.refresh!
 
       report_metric "passenger.processes.max", "Processes", @status_parser.processes_max
       report_metric "passenger.processes.running", "Processes", @status_parser.processes_running
@@ -53,7 +52,7 @@ module PassengerAgent
 
 
     def report_passenger_memory_stats
-      @memory_stats_parser.output_to_parse = run_command(passenger_memory_stats)
+      return unless @memory_stats_parser.refresh!
 
       report_metric "passenger.memory.total", "Megabyte", @memory_stats_parser.passenger_memory_total
       @memory_stats_parser.passenger_memory_per_app.each do |app, memory_usage|
@@ -63,31 +62,9 @@ module PassengerAgent
 
 
     def poll_cycle
-      
       report_passenger_status
-
       report_passenger_memory_stats
-
     end
-
-    
-    private      
-
-    def run_command(command)
-      
-      #uncomment to test example_output files
-      #return File.read("example_output/#{command.split('/').last}_version-#{passenger_version}")
-
-      result = `#{command}`
-
-      unless $?.success?
-        $stderr.puts "failed executing #{command}"
-        exit 1
-      end
-
-      result
-    end
-
 
   end
 

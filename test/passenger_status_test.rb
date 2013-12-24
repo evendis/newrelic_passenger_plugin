@@ -1,14 +1,13 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
-require File.join(File.dirname(__FILE__), '../lib/passenger_status_parser')
 
 class PassengerStatusTest < Test::Unit::TestCase
 
   def setup
-    @status_parser_v3 = PassengerStatusParser.new(3)
+    @status_parser_v3 = PassengerStatusParser.new(nil,3)
     example_output_file = File.join(File.dirname(__FILE__), 'example_output/passenger-status_version-3')
     @status_parser_v3.output_to_parse = File.read(example_output_file)
 
-    @status_parser_v4 = PassengerStatusParser.new(4)
+    @status_parser_v4 = PassengerStatusParser.new(nil,4)
     example_output_file = File.join(File.dirname(__FILE__), 'example_output/passenger-status_version-4')
     @status_parser_v4.output_to_parse = File.read(example_output_file)
   end

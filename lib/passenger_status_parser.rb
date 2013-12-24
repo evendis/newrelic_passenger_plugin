@@ -1,48 +1,45 @@
-class PassengerStatusParser
-  attr_accessor :output_to_parse
-  attr_reader :passenger_version
+class PassengerStatusParser < PassengerParser
 
-  def initialize(version = 3)
-    @passenger_version = version
-    @matches = {}
+  def matches
+    @matches ||= if passenger_version
+      matches = {}
 
-    @matches[:processes_max] = /max\s+=\s+(\d+)/ if @passenger_version.eql?(3)
-    #Max pool size : 6
-    @matches[:processes_max] = /Max pool size\s+:\s+(\d+)/ if @passenger_version.eql?(4)
+      matches[:processes_max] = /max\s+=\s+(\d+)/ if passenger_version.eql?(3)
+      #Max pool size : 6
+      matches[:processes_max] = /Max pool size\s+:\s+(\d+)/ if passenger_version.eql?(4)
 
 
-    @matches[:processes_running] = /count\s+=\s+(\d+)/ if @passenger_version.eql?(3)
-    #Processes     : 6
-    @matches[:processes_running] = /Processes\s+:\s+(\d+)/ if @passenger_version.eql?(4)
+      matches[:processes_running] = /count\s+=\s+(\d+)/ if passenger_version.eql?(3)
+      #Processes     : 6
+      matches[:processes_running] = /Processes\s+:\s+(\d+)/ if passenger_version.eql?(4)
 
 
-    @matches[:queue_waiting] = /Waiting on global queue:\s+(\d+)/ if @passenger_version.eql?(3)
-    #Requests in top-level queue : 0
-    @matches[:queue_waiting] = /Requests in top-level queue\s+:\s+(\d+)/ if @passenger_version.eql?(4)
+      matches[:queue_waiting] = /Waiting on global queue:\s+(\d+)/ if passenger_version.eql?(3)
+      #Requests in top-level queue : 0
+      matches[:queue_waiting] = /Requests in top-level queue\s+:\s+(\d+)/ if passenger_version.eql?(4)
+      matches
+    end
   end
 
-
-
-
   def processes_max
-    match = output_to_parse.match(@matches[:processes_max])
+    match = output_to_parse.match(matches[:processes_max])
     match[1]
   end
 
   def processes_running
-    match = output_to_parse.match(@matches[:processes_running])
+    match = output_to_parse.match(matches[:processes_running])
     match[1]
   end
 
   def processes_active
-    if @passenger_version.eql?(3)
+    if passenger_version.eql?(3)
       match = output_to_parse.match(/active\s+=\s+(\d+)/)
       match[1]
     end
   end
 
   def queue_waiting
-    match = output_to_parse.match(@matches[:queue_waiting])
+    match = output_to_parse.match(matches[:queue_waiting])
     match[1]
   end
 

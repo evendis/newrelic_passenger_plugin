@@ -1,6 +1,4 @@
-class PassengerMemoryStatsParser
-
-  attr_accessor :output_to_parse
+class PassengerMemoryStatsParser < PassengerParser
 
   def passenger_memory_total(command_output = output_to_parse)
     match = command_output.match(/RSS:\s*([\d\.]+)\s*MB\Z/m)

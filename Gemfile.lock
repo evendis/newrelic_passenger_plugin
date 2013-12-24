@@ -4,6 +4,9 @@ GEM
     faraday (0.8.8)
       multipart-post (~> 1.2.0)
     json (1.8.0)
+    metaclass (0.0.1)
+    mocha (0.14.0)
+      metaclass (~> 0.0.1)
     multipart-post (1.2.0)
     newrelic_plugin (1.0.3)
       faraday (>= 0.8.1)
@@ -15,6 +18,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  mocha
   newrelic_plugin
   rake
   test-unit

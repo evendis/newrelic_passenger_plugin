@@ -1,5 +1,4 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
-require File.join(File.dirname(__FILE__), '../lib/passenger_memory_stats_parser')
 
 class PassengerMemoryStatsTest < Test::Unit::TestCase
 
