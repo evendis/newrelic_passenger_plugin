@@ -3,7 +3,12 @@ class PassengerMemoryStatsParser < PassengerParser
   def passenger_memory_total(command_output = output_to_parse)
     match = command_output.match(/RSS:\s*([\d\.]+)\s*MB\Z/m)
 
-    match[1]
+    return match[1] if match
+
+    total_mem_for_v4_0_33 = passenger_memory_per_app.values.inject(:+)
+    return total_mem_for_v4_0_33.to_s if total_mem_for_v4_0_33
+
+    return 0.to_s
   end
 
   def passenger_memory_per_app(command_output = output_to_parse)
